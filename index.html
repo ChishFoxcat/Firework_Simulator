@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>烟花模拟器 - 赛博烟花</title>
+    <meta name="viewport" content="width=device-width, initial-sccale=1, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#000000">
+    <link href="https://cdn.bakaomg.cn/packages/fonts/TencentFont_W7/font.css" rel="stylesheet">
+    <link href="assets/css/main.css" rel="stylesheet">
+</head>
+<body class="loading">
+<!-- SVG SpriteSheet -->
+<div style="height: 0; width: 0; position: absolute; visibility: hidden;">
+    <svg xmlns="http://www.w3.org/2000/svg">
+        <symbol id="icon-play" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z"/>
+        </symbol>
+        <symbol id="icon-pause" viewBox="0 0 24 24">
+            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+        </symbol>
+        <symbol id="icon-close" viewBox="0 0 24 24">
+            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        </symbol>
+        <symbol id="icon-settings" viewBox="0 0 24 24">
+            <path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/>
+        </symbol>
+        <symbol id="icon-sound-on" viewBox="0 0 24 24">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+        </symbol>
+        <symbol id="icon-sound-off" viewBox="0 0 24 24">
+            <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+        </symbol>
+    </svg>
+</div>
+
+<!-- APP -->
+<div class="container">
+    <div class="loading-init">
+        <div class="loading-init__header">
+            <div class="loading-init__text">
+                <div>加载中</div>
+                <div id="loading-init__point"></div>
+            </div>
+        </div>
+        <div class="loading-init__status">
+            正在装配烟花
+        </div>
+    </div>
+    <div class="stage-container remove">
+        <div class="canvas-container">
+            <canvas id="trails-canvas"></canvas>
+            <canvas id="main-canvas"></canvas>
+        </div>
+        <div class="menu hide">
+            <div class="menu__inner-wrap">
+                <div class="btn btn--bright close-menu-btn">
+                    <svg fill="white" width="24" height="24">
+                        <use href="#icon-close" xlink:href="#icon-close"></use>
+                    </svg>
+                </div>
+                <div class="menu__header">
+                    设置
+                </div>
+                <div class="menu__subheader">
+                    点击选项标题查看相关说明
+                </div>
+                <form>
+                    <div class="form-option form-option--select">
+                        <label class="shell-type-label">
+                            烟花类型
+                        </label>
+                        <select class="shell-type"></select>
+                    </div>
+                    <div class="form-option form-option--select">
+                        <label class="shell-size-label">
+                            烟花大小
+                        </label>
+                        <select class="shell-size"></select>
+                    </div>
+                    <div class="form-option form-option--select">
+                        <label class="quality-ui-label">
+                            画质
+                        </label>
+                        <select class="quality-ui"></select>
+                    </div>
+                    <div class="form-option form-option--select">
+                        <label class="sky-lighting-label">
+                            天空照明
+                        </label>
+                        <select class="sky-lighting"></select>
+                    </div>
+                    <div class="form-option form-option--select">
+                        <label class="scaleFactor-label">
+                            缩放
+                        </label>
+                        <select class="scaleFactor"></select>
+                    </div>
+                    <div class="form-option form-option--checkbox">
+                        <label class="auto-launch-label">
+                            自动发射
+                        </label>
+                        <input class="auto-launch" type="checkbox"/>
+                    </div>
+                    <div class="form-option form-option--checkbox form-option--finale-mode">
+                        <label class="finale-mode-label">
+                            结局模式
+                        </label>
+                        <input class="finale-mode" type="checkbox"/>
+                    </div>
+                    <div class="form-option form-option--checkbox">
+                        <label class="hide-controls-label">
+                            隐藏控制按钮
+                        </label>
+                        <input class="hide-controls" type="checkbox"/>
+                    </div>
+                    <div class="form-option form-option--checkbox form-option--fullscreen">
+                        <label class="fullscreen-label">
+                            全屏
+                        </label>
+                        <input class="fullscreen" type="checkbox"/>
+                    </div>
+                    <div class="form-option form-option--checkbox">
+                        <label class="long-exposure-label">
+                            保留烟花轨迹
+                        </label>
+                        <input class="long-exposure" type="checkbox"/>
+                    </div>
+                </form>
+                <div class="credits">
+                    <div class="credit-btn">
+                        <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M512 0c282.624 0 512 229.376 512 512s-229.376 512-512 512S0 794.624 0 512 229.376 0 512 0z m0 256c-141.312 0-256 114.688-256 256a256.1024 256.1024 0 0 0 475.5456 131.6864l-87.808-52.6336a153.6 153.6 0 1 1 0.0512-158.0544l87.7568-52.736A255.9488 255.9488 0 0 0 512 256z" fill="#000000"></path></svg>
+                    </div>
+                    <div class="copy">
+                        <script>
+                            var mydate = new Date();
+                            document.writeln("Copyright&nbsp;&copy;&nbsp;2021 - " + mydate.getFullYear() + '&nbsp;<a target="_blank" href="https://github.com/ChishFoxcat">Chish</a>&nbsp;All&nbsp;Rights&nbsp;Reserved');
+                        </script>
+                        <p>
+                            此项目参考 <a href="https://github.com/NianBroken/Firework_Simulator">NianBroken/Firework_Simulator</a>｜基于
+                            <a href="https://codepen.io/MillerTime/pen/XgpNwb">XgpNwb</a> 二次修改
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="help-modal">
+        <div class="help-modal__overlay"></div>
+        <div class="help-modal__dialog">
+            <div class="help-modal__header"></div>
+            <div class="help-modal__body"></div>
+            <button type="button" class="help-modal__close-btn">关闭</button>
+        </div>
+    </div>
+</div>
+<div class="time-text">
+    <div id="Now-Time">
+        <div class="time"></div>
+        <div class="date"></div>
+    </div>
+    <div class="Next-Time">
+        <div id="Next-Year-Time"></div>
+    </div>
+</div>
+<div id="right-bottom-button">
+    <div class="parent-button">
+        <svg class="o" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+            <path d="M511.99 960.22C264.84 960.22 63.77 759.15 63.77 512S264.84 63.78 511.99 63.78 960.23 264.85 960.23 512 759.14 960.22 511.99 960.22z m0-823.81C304.88 136.41 136.4 304.89 136.4 512s168.48 375.59 375.59 375.59c207.13 0 375.61-168.48 375.61-375.59S719.12 136.41 511.99 136.41z"></path>
+        </svg>
+        <svg class="x" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+            <path d="M571.733333 512l268.8-268.8c17.066667-17.066667 17.066667-42.666667 0-59.733333-17.066667-17.066667-42.666667-17.066667-59.733333 0L512 452.266667 243.2 183.466667c-17.066667-17.066667-42.666667-17.066667-59.733333 0-17.066667 17.066667-17.066667 42.666667 0 59.733333L452.266667 512 183.466667 780.8c-17.066667 17.066667-17.066667 42.666667 0 59.733333 8.533333 8.533333 19.2 12.8 29.866666 12.8s21.333333-4.266667 29.866667-12.8L512 571.733333l268.8 268.8c8.533333 8.533333 19.2 12.8 29.866667 12.8s21.333333-4.266667 29.866666-12.8c17.066667-17.066667 17.066667-42.666667 0-59.733333L571.733333 512z"></path>
+        </svg>
+    </div>
+    <div class="btn pause-btn">
+        <svg fill="white" width="24" height="24">
+            <use href="#icon-pause" xlink:href="#icon-pause"></use>
+        </svg>
+    </div>
+    <div class="btn sound-btn">
+        <svg fill="white" width="24" height="24">
+            <use href="#icon-sound-off" xlink:href="#icon-sound-off"></use>
+        </svg>
+    </div>
+</div>
+
+<!-- Javascript -->
+<script src="assets/js/fscreen.js"></script>
+<script src="assets/js/mymath.js"></script>
+<script src="assets/js/stage.js"></script>
+<script src="assets/js/lunar.js"></script>
+<script src="assets/js/fireworks.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
