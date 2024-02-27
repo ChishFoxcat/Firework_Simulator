@@ -10,4 +10,4 @@
 ###### 2. 烟花被禁止了，但是我们仍然可以在这里看到它们。
 #### 3. 翻译参考自 NianBroken 的翻译，并加以修改
 ### 🎇 DEMO
-#### [点击这里](https://demo.fchish.cn/Firework_Simulator/) 查看 DEMO
+#### [点击这里](https://firework.chish.fun) 查看 DEMO
